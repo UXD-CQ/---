@@ -4,85 +4,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手机量角器</title>
+    <title>手机量角器原型</title>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #000;
-        }
-
-        video {
-            display: block;
-            max-width: 100%;
-            max-height: 100%;
+            background: #f0f0f0;
         }
 
         canvas {
+            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        #angle-display {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 18px;
         }
     </style>
 </head>
 
 <body>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="overlay"></canvas>
+    <div id="angle-display">角度: 0°</div>
+    <canvas id="protractorCanvas"></canvas>
     <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('overlay');
+        const canvas = document.getElementById('protractorCanvas');
         const context = canvas.getContext('2d');
+        const angleDisplay = document.getElementById('angle-display');
+        let currentAngle = 0;
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const constraints = {
-            video: {
-                facingMode: 'environment'
-            }
-        };
-
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((err) => {
-                console.error('Error accessing the camera: ', err);
-            });
+        function resizeCanvas() {
+            canvas.width = window.innerWidth - 20;
+            canvas.height = window.innerHeight - 20;
+            drawProtractor();
+        }
 
         function drawProtractor() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = Math.min(canvas.width, canvas.height) / 3;
+            const radius = Math.min(canvas.width, canvas.height) / 2.5;
             const startAngle = Math.PI;
             const endAngle = 2 * Math.PI;
 
-            // Draw the outer arc
-            context.strokeStyle = 'white';
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw outer arc-绘制外圆弧
+            context.strokeStyle = 'black';
             context.lineWidth = 2;
             context.beginPath();
             context.arc(centerX, centerY, radius, startAngle, endAngle);
             context.stroke();
 
-            // Draw the inner arc
+            // Draw inner arc-绘制内圆弧
             context.beginPath();
             context.arc(centerX, centerY, radius - 20, startAngle, endAngle);
             context.stroke();
 
-            // Draw the base line
+            // Draw baseline-绘制基线
             context.beginPath();
             context.moveTo(centerX - radius, centerY);
             context.lineTo(centerX + radius, centerY);
             context.stroke();
 
-            // Draw tick marks and labels
+            // Draw tick marks and labels-绘制刻度标记和标签
             for (let i = 0; i <= 180; i += 10) {
                 const angle = (i - 90) * (Math.PI / 180);
                 const xOuter = centerX + Math.cos(angle) * radius;
@@ -95,26 +89,43 @@
                 context.lineTo(xOuter, yOuter);
                 context.stroke();
 
-                // Draw the labels every 10 degrees
+                // Draw the labels every 10 degrees-每 10 度绘制一次标签
                 if (i % 10 === 0) {
-                    context.fillStyle = 'white';
+                    context.fillStyle = 'black';
                     context.font = '14px Arial';
-                    const xText = centerX + Math.cos(angle) * (radius - 30);
-                    const yText = centerY + Math.sin(angle) * (radius - 30);
+                    const xText = centerX + Math.cos(angle) * (radius - 40);
+                    const yText = centerY + Math.sin(angle) * (radius - 40);
                     context.fillText(i.toString(), xText - 10, yText + 5);
                 }
             }
+
+            // Draw the current angle line-绘制当前角度线
+            const angleRadians = (currentAngle - 90) * (Math.PI / 180);
+            const xAngle = centerX + Math.cos(angleRadians) * radius;
+            const yAngle = centerY + Math.sin(angleRadians) * radius;
+
+            context.strokeStyle = 'red';
+            context.beginPath();
+            context.moveTo(centerX, centerY);
+            context.lineTo(xAngle, yAngle);
+            context.stroke();
         }
 
-        video.addEventListener('play', () => {
+        function updateAngle(event) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const x = event.touches[0].clientX - centerX;
+            const y = event.touches[0].clientY - centerY;
+            const angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+            currentAngle = (angle < 0) ? angle + 360 : angle;
+            angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
             drawProtractor();
-        });
+        }
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            drawProtractor();
-        });
+        canvas.addEventListener('touchmove', updateAngle);
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
     </script>
 </body>
 

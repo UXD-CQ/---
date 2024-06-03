@@ -4,110 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手机量角器</title>
+    <title>响应式网页示例</title>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #000;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #000000;
         }
 
-        video {
-            display: block;
-            max-width: 100%;
-            max-height: 100%;
+
+        .f-box {
+            width: 390px;
+            height: 844px;
         }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .logo {
+            margin: 40px 10px;
+            float: left;
+            position: relative;
         }
+        
     </style>
 </head>
 
 <body>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="overlay"></canvas>
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('overlay');
-        const context = canvas.getContext('2d');
-
-        function adjustCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        adjustCanvasSize();
-
-        const constraints = {
-            video: {
-                facingMode: 'environment'
-            }
-        };
-
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((err) => {
-                console.error('Error accessing the camera: ', err);
-            });
-
-        function drawProtractor() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = Math.min(canvas.width, canvas.height) / 3;
-            const startAngle = Math.PI;
-            const endAngle = 2 * Math.PI;
-
-            // Draw the outer arc
-            context.strokeStyle = 'white';
-            context.lineWidth = 2;
-            context.beginPath();
-            context.arc(centerX, centerY, radius, startAngle, endAngle);
-            context.stroke();
-
-            // Draw tick marks and labels
-            for (let i = 0; i <= 180; i += 10) {
-                const angle = (i - 90) * (Math.PI / 180);
-                const xOuter = centerX + Math.cos(angle) * radius;
-                const yOuter = centerY + Math.sin(angle) * radius;
-                const xInner = centerX + Math.cos(angle) * (radius - 20);
-                const yInner = centerY + Math.sin(angle) * (radius - 20);
-
-                context.beginPath();
-                context.moveTo(xInner, yInner);
-                context.lineTo(xOuter, yOuter);
-                context.stroke();
-
-                // Draw the labels every 10 degrees
-                if (i % 10 === 0) {
-                    context.fillStyle = 'white';
-                    context.font = '14px Arial';
-                    const xText = centerX + Math.cos(angle) * (radius - 30);
-                    const yText = centerY + Math.sin(angle) * (radius - 30);
-                    context.fillText(i.toString(), xText - 10, yText + 5);
-                }
-            }
-        }
-
-        video.addEventListener('play', () => {
-            drawProtractor();
-        });
-
-        window.addEventListener('resize', () => {
-            adjustCanvasSize();
-            drawProtractor();
-        });
-    </script>
+    <div class="f-box">
+        <div class="logo">
+            <img src="images/App Icon.png" alt="">
+        </div>
+        <div class="logo">
+            <img src="images/App Icon 2.png" alt="">
+        </div>
+        <div class="logo">
+            <img src="images/App Icon 3.png" alt="">
+        </div>
+        <div class="logo">
+            <img src="images/App Icon 4.png" alt="">
+        </div>
+    </div>
 </body>
 
 </html>
