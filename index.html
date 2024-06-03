@@ -1,35 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Access</title>
+    <title>Document</title>
 </head>
-
 <body>
-    <h1>Access Camera</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <script>
-        // Get access to the camera
-        const video = document.getElementById('video');
-
-        // Use facingMode: environment to access the rear camera on phones
-        const constraints = {
-            video: {
-                facingMode: 'environment'
-            }
-        };
-
-        // Start the video stream
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((err) => {
-                console.error('Error accessing the camera: ', err);
-            });
-    </script>
+    <a href="调用摄像头.html" target="_blank" rel="noopener noreferrer">调用摄像头</a>
+    <a href="量角器.html" target="_blank" rel="noopener noreferrer">量角器</a>
 </body>
-
 </html>
