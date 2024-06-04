@@ -12,19 +12,14 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
             overflow: hidden;
-            position: relative;
-            /* 添加相对定位 */
         }
 
-        #video-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
+        canvas {
+            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         #angle-display {
@@ -37,51 +32,27 @@
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 18px;
-            z-index: 1;
-        }
-
-        canvas {
-            position: absolute;
-            /* 添加绝对定位 */
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            /* 防止画布上的内容干扰用户交互 */
         }
     </style>
 </head>
 
 <body>
-    <!-- 相机权限说明 -->
-    <div id="camera-permission-info">
-        <p>为了测量角度，我们需要使用您的设备摄像头。请允许访问摄像头以继续。</p>
-        <button id="allow-camera-access-btn">允许访问摄像头</button>
-    </div>
-    <!-- 视频背景、角度显示和画布 -->
-    <video id="video-background" autoplay playsinline muted></video>
     <div id="angle-display">角度: 0°</div>
-    <canvas id="protractorCanvas"></canvas> <!-- 保留原量角器的画布 -->
+    <canvas id="protractorCanvas"></canvas>
     <script>
         const canvas = document.getElementById('protractorCanvas');
         const context = canvas.getContext('2d');
         const angleDisplay = document.getElementById('angle-display');
         let currentAngle = 0;
 
-        async function setupCamera() {
-            const video = document.getElementById('video-background');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); // 使用后置摄像头
-            video.srcObject = stream;
-        }
-
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth - 20;
+            canvas.height = window.innerHeight - 20;
             drawProtractor();
         }
 
         function drawProtractor() {
-            // 绘制量角器的逻辑，保持不变
-            const centerX = canvas.width / 2 - 200;
+            const centerX = canvas.width / 2 - 100;
             const centerY = canvas.height / 2;
             const radius = Math.min(canvas.width, canvas.height) / 1.5;
             const startAngle = 3 * Math.PI / 2;
@@ -148,8 +119,8 @@
 
             // Draw the current angle line
             const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // Adjust angle direction
-            const xAngle = centerX + Math.cos(angleRadians) * radius;
-            const yAngle = centerY + Math.sin(angleRadians) * radius;
+            const xAngle = centerX + Math.cos(angleRadians) * (radius + 200); // Extended length
+            const yAngle = centerY + Math.sin(angleRadians) * (radius + 200); // Extended length
 
             context.strokeStyle = 'red';
             context.beginPath();
@@ -159,24 +130,23 @@
         }
 
         function updateAngle(event) {
-            // 更新角度的逻辑，保持不变
             const rect = canvas.getBoundingClientRect();
-            const centerX = canvas.width / 2 - 200;
+            const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const x = event.touches[0].clientX - rect.left;
             const y = event.touches[0].clientY - rect.top;
             const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI) + 90;
             if (angle < 0) angle += 360;
             if (angle > 180) angle = 180;
-            currentAngle = 180 - angle; // 调整角度方向
+            currentAngle = 180 - angle; // Adjust angle direction
             angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
             drawProtractor();
         }
 
-        window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('touchmove', updateAngle);
 
-        setupCamera().then(resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
     </script>
 </body>
 

@@ -119,8 +119,8 @@
 
             // Draw the current angle line
             const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // Adjust angle direction
-            const xAngle = centerX + Math.cos(angleRadians) * radius;
-            const yAngle = centerY + Math.sin(angleRadians) * radius;
+            const xAngle = centerX + Math.cos(angleRadians) * (radius + 200); // Extended length
+            const yAngle = centerY + Math.sin(angleRadians) * (radius + 200); // Extended length
 
             context.strokeStyle = 'red';
             context.beginPath();
