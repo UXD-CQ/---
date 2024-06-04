@@ -52,10 +52,10 @@
 
         function drawProtractor() {
             const centerX = canvas.width / 2;
-            const centerY = canvas.height * 0.75;
+            const centerY = canvas.height / 2;
             const radius = Math.min(canvas.width, canvas.height) / 2.5;
-            const startAngle = Math.PI;
-            const endAngle = 2 * Math.PI;
+            const startAngle = 3 * Math.PI / 2;
+            const endAngle = Math.PI / 2;
 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -63,18 +63,18 @@
             context.strokeStyle = 'black';
             context.lineWidth = 2;
             context.beginPath();
-            context.arc(centerX, centerY, radius, startAngle, endAngle);
+            context.arc(centerX, centerY, radius, startAngle, endAngle, true);
             context.stroke();
 
             // Draw baseline
             context.beginPath();
-            context.moveTo(centerX - radius, centerY);
-            context.lineTo(centerX + radius, centerY);
+            context.moveTo(centerX, centerY - radius);
+            context.lineTo(centerX, centerY + radius);
             context.stroke();
 
             // Draw tick marks and labels
             for (let i = 0; i <= 180; i += 10) {
-                const angle = (i - 180) * (Math.PI / 180);
+                const angle = (i + 90) * (Math.PI / 180);
                 const xOuter = centerX + Math.cos(angle) * radius;
                 const yOuter = centerY + Math.sin(angle) * radius;
                 const xInner = centerX + Math.cos(angle) * (radius - 20);
@@ -89,27 +89,27 @@
                 if (i % 10 === 0) {
                     context.fillStyle = 'black';
                     context.font = '14px Arial';
-                    const xText1 = centerX + Math.cos(angle) * (radius - 40);
-                    const yText1 = centerY + Math.sin(angle) * (radius - 40);
+                    const xText1 = centerX + Math.cos(angle) * (radius - 35);
+                    const yText1 = centerY + Math.sin(angle) * (radius - 35);
+                    const xText2 = centerX + Math.cos(angle) * (radius - 50);
+                    const yText2 = centerY + Math.sin(angle) * (radius - 50);
+
                     context.save();
                     context.translate(xText1, yText1);
-                    context.rotate(angle + Math.PI / 2);
+                    context.rotate(angle - Math.PI / 2);
                     context.fillText(i.toString(), -10, 5);
                     context.restore();
 
-                    // Draw the 180-0 labels
-                    const xText2 = centerX + Math.cos(angle) * (radius - 55);
-                    const yText2 = centerY + Math.sin(angle) * (radius - 55);
                     context.save();
                     context.translate(xText2, yText2);
-                    context.rotate(angle + Math.PI / 2);
+                    context.rotate(angle - Math.PI / 2);
                     context.fillText((180 - i).toString(), -10, 5);
                     context.restore();
                 }
             }
 
             // Draw the current angle line
-            const angleRadians = (currentAngle - 180) * (Math.PI / 180);
+            const angleRadians = (currentAngle + 90) * (Math.PI / 180);
             const xAngle = centerX + Math.cos(angleRadians) * radius;
             const yAngle = centerY + Math.sin(angleRadians) * radius;
 
@@ -122,10 +122,10 @@
 
         function updateAngle(event) {
             const centerX = canvas.width / 2;
-            const centerY = canvas.height * 0.75;
+            const centerY = canvas.height / 2;
             const x = event.touches[0].clientX - centerX;
             const y = event.touches[0].clientY - centerY;
-            const angle = Math.atan2(y, x) * (180 / Math.PI) + 180;
+            const angle = Math.atan2(y, x) * (180 / Math.PI) - 90;
             currentAngle = (angle < 0) ? angle + 360 : angle;
             angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
             drawProtractor();
