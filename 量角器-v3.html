@@ -55,8 +55,8 @@
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const radius = Math.min(canvas.width, canvas.height) / 2.5;
-            const startAngle = Math.PI / 2;
-            const endAngle = 3 * Math.PI / 2;
+            const startAngle = 3 * Math.PI / 2;
+            const endAngle = Math.PI / 2;
 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -72,30 +72,15 @@
             context.arc(centerX, centerY, radius, startAngle, endAngle, true);
             context.stroke();
 
-            context.restore();
-
-            context.save();
-            context.translate(centerX, centerY);
-            context.rotate(-Math.PI / 2);
-            context.translate(-centerX, -centerY);
-
             // Draw baseline
-            context.strokeStyle = 'black';
             context.beginPath();
-            context.moveTo(centerX - radius, centerY);
-            context.lineTo(centerX + radius, centerY);
+            context.moveTo(centerX, centerY - radius);
+            context.lineTo(centerX, centerY + radius);
             context.stroke();
-
-            context.restore();
-
-            context.save();
-            context.translate(centerX, centerY);
-            context.rotate(Math.PI);
-            context.translate(-centerX, -centerY);
 
             // Draw tick marks and labels
             for (let i = 0; i <= 180; i += 10) {
-                const angle = (i - 90) * (Math.PI / 180);
+                const angle = (i + 90) * (Math.PI / 180); // Rotated 180 degrees
                 const xOuter = centerX + Math.cos(angle) * radius;
                 const yOuter = centerY + Math.sin(angle) * radius;
                 const xInner = centerX + Math.cos(angle) * (radius - 20);
@@ -133,7 +118,7 @@
             context.restore();
 
             // Draw the current angle line
-            const angleRadians = (currentAngle - 90) * (Math.PI / 180);
+            const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // Adjust angle direction
             const xAngle = centerX + Math.cos(angleRadians) * radius;
             const yAngle = centerY + Math.sin(angleRadians) * radius;
 
@@ -145,12 +130,15 @@
         }
 
         function updateAngle(event) {
+            const rect = canvas.getBoundingClientRect();
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const x = event.touches[0].clientX - centerX;
-            const y = event.touches[0].clientY - centerY;
-            const angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-            currentAngle = (angle < 0) ? angle + 360 : angle;
+            const x = event.touches[0].clientX - rect.left;
+            const y = event.touches[0].clientY - rect.top;
+            const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI) + 90;
+            if (angle < 0) angle += 360;
+            if (angle > 180) angle = 180;
+            currentAngle = 180 - angle; // Adjust angle direction
             angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
             drawProtractor();
         }
