@@ -1,8 +1,89 @@
-<script>
-    function drawProtractor() {
-            const centerX = canvas.width / 2;
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机量角器原型</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            /* 添加相对定位 */
+        }
+
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        #angle-display {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            z-index: 1;
+        }
+
+        canvas {
+            position: absolute;
+            /* 添加绝对定位 */
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            /* 防止画布上的内容干扰用户交互 */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 相机权限说明 -->
+    <div id="camera-permission-info">
+        <p>为了测量角度，我们需要使用您的设备摄像头。请允许访问摄像头以继续。</p>
+        <button id="allow-camera-access-btn">允许访问摄像头</button>
+    </div>
+    <!-- 视频背景、角度显示和画布 -->
+    <video id="video-background" autoplay playsinline muted></video>
+    <div id="angle-display">角度: 0°</div>
+    <canvas id="protractorCanvas"></canvas> <!-- 保留原量角器的画布 -->
+    <script>
+        const canvas = document.getElementById('protractorCanvas');
+        const context = canvas.getContext('2d');
+        const angleDisplay = document.getElementById('angle-display');
+        let currentAngle = 0;
+
+        async function setupCamera() {
+            const video = document.getElementById('video-background');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); // 使用后置摄像头
+            video.srcObject = stream;
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawProtractor();
+        }
+
+        function drawProtractor() {
+            // 绘制量角器的逻辑，保持不变
+            const centerX = canvas.width / 2 - 200;
             const centerY = canvas.height / 2;
-            const radius = Math.min(canvas.width, canvas.height) / 3; // 调整量角器的大小
+            const radius = Math.min(canvas.width, canvas.height) / 1.5;
             const startAngle = 3 * Math.PI / 2;
             const endAngle = Math.PI / 2;
 
@@ -13,26 +94,26 @@
             context.rotate(Math.PI);
             context.translate(-centerX, -centerY);
 
-            // 绘制外圆弧
+            // Draw outer arc
             context.strokeStyle = 'black';
             context.lineWidth = 2;
             context.beginPath();
             context.arc(centerX, centerY, radius, startAngle, endAngle, true);
             context.stroke();
 
-            // 绘制基准线
+            // Draw baseline
             context.beginPath();
             context.moveTo(centerX, centerY - radius);
             context.lineTo(centerX, centerY + radius);
             context.stroke();
 
-            // 绘制刻度线和标签
+            // Draw tick marks and labels
             for (let i = 0; i <= 180; i += 10) {
-                const angle = (i + 90) * (Math.PI / 180); // 旋转180度
+                const angle = (i + 90) * (Math.PI / 180); // Rotated 180 degrees
                 const xOuter = centerX + Math.cos(angle) * radius;
                 const yOuter = centerY + Math.sin(angle) * radius;
-                const xInner = centerX + Math.cos(angle) * (radius - 20); // 调整刻度线长度
-                const yInner = centerY + Math.sin(angle) * (radius - 20); // 调整刻度线长度
+                const xInner = centerX + Math.cos(angle) * (radius - 20);
+                const yInner = centerY + Math.sin(angle) * (radius - 20);
 
                 context.strokeStyle = 'black';
                 context.beginPath();
@@ -40,7 +121,7 @@
                 context.lineTo(xOuter, yOuter);
                 context.stroke();
 
-                // 绘制0-180度标签，每10度一个标签
+                // Draw the 0-180 labels every 10 degrees
                 if (i % 10 === 0) {
                     context.fillStyle = 'black';
                     context.font = '14px Arial';
@@ -65,8 +146,8 @@
 
             context.restore();
 
-            // 绘制当前角度线
-            const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // 调整角度方向
+            // Draw the current angle line
+            const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // Adjust angle direction
             const xAngle = centerX + Math.cos(angleRadians) * radius;
             const yAngle = centerY + Math.sin(angleRadians) * radius;
 
@@ -77,4 +158,26 @@
             context.stroke();
         }
 
-</script>
+        function updateAngle(event) {
+            // 更新角度的逻辑，保持不变
+            const rect = canvas.getBoundingClientRect();
+            const centerX = canvas.width / 2 - 200;
+            const centerY = canvas.height / 2;
+            const x = event.touches[0].clientX - rect.left;
+            const y = event.touches[0].clientY - rect.top;
+            const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI) + 90;
+            if (angle < 0) angle += 360;
+            if (angle > 180) angle = 180;
+            currentAngle = 180 - angle; // 调整角度方向
+            angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
+            drawProtractor();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        canvas.addEventListener('touchmove', updateAngle);
+
+        setupCamera().then(resizeCanvas);
+    </script>
+</body>
+
+</html>

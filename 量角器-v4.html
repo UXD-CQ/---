@@ -155,7 +155,7 @@
         function updateAngle(event) {
             // 更新角度的逻辑，保持不变
             const rect = canvas.getBoundingClientRect();
-            const centerX = canvas.width / 2;
+            const centerX = canvas.width / 2 - 200;
             const centerY = canvas.height / 2;
             const x = event.touches[0].clientX - rect.left;
             const y = event.touches[0].clientY - rect.top;
