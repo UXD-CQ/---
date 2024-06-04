@@ -65,22 +65,22 @@
             context.rotate(Math.PI);
             context.translate(-centerX, -centerY);
 
-            // Draw outer arc
+            // 绘制外圆弧
             context.strokeStyle = 'black';
             context.lineWidth = 2;
             context.beginPath();
             context.arc(centerX, centerY, radius, startAngle, endAngle, true);
             context.stroke();
 
-            // Draw baseline
+            // 绘制基线
             context.beginPath();
             context.moveTo(centerX, centerY - radius);
             context.lineTo(centerX, centerY + radius);
             context.stroke();
 
-            // Draw tick marks and labels
+            // 绘制刻度标记和标签
             for (let i = 0; i <= 180; i += 10) {
-                const angle = (i + 90) * (Math.PI / 180); // Rotated 180 degrees
+                const angle = (i + 90) * (Math.PI / 180); // 旋转180度
                 const xOuter = centerX + Math.cos(angle) * radius;
                 const yOuter = centerY + Math.sin(angle) * radius;
                 const xInner = centerX + Math.cos(angle) * (radius - 20);
@@ -92,7 +92,7 @@
                 context.lineTo(xOuter, yOuter);
                 context.stroke();
 
-                // Draw the 0-180 labels every 10 degrees
+                // 每 10 度绘制 0-180 度的标签
                 if (i % 10 === 0) {
                     context.fillStyle = 'black';
                     context.font = '14px Arial';
@@ -117,10 +117,10 @@
 
             context.restore();
 
-            // Draw the current angle line
-            const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // Adjust angle direction
-            const xAngle = centerX + Math.cos(angleRadians) * (radius + 200); // Extended length
-            const yAngle = centerY + Math.sin(angleRadians) * (radius + 200); // Extended length
+            // 绘制当前角度线
+            const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // 调整角度方向
+            const xAngle = centerX + Math.cos(angleRadians) * (radius + 200); // 延伸长度
+            const yAngle = centerY + Math.sin(angleRadians) * (radius + 200); // 延伸长度
 
             context.strokeStyle = 'red';
             context.beginPath();
@@ -138,7 +138,7 @@
             const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI) + 90;
             if (angle < 0) angle += 360;
             if (angle > 180) angle = 180;
-            currentAngle = 180 - angle; // Adjust angle direction
+            currentAngle = 180 - angle; // 调整角度方向
             angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
             drawProtractor();
         }
