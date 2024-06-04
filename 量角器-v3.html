@@ -80,6 +80,7 @@
             context.translate(-centerX, -centerY);
 
             // Draw baseline
+            context.strokeStyle = 'black';
             context.beginPath();
             context.moveTo(centerX - radius, centerY);
             context.lineTo(centerX + radius, centerY);
@@ -100,6 +101,7 @@
                 const xInner = centerX + Math.cos(angle) * (radius - 20);
                 const yInner = centerY + Math.sin(angle) * (radius - 20);
 
+                context.strokeStyle = 'black';
                 context.beginPath();
                 context.moveTo(xInner, yInner);
                 context.lineTo(xOuter, yOuter);
