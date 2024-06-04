@@ -1,61 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手机量角器原型</title>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
-
-        canvas {
-            border: 1px solid #ccc;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        #angle-display {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="angle-display">角度: 0°</div>
-    <canvas id="protractorCanvas"></canvas>
-    <script>
-        const canvas = document.getElementById('protractorCanvas');
-        const context = canvas.getContext('2d');
-        const angleDisplay = document.getElementById('angle-display');
-        let currentAngle = 0;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth - 20;
-            canvas.height = window.innerHeight - 20;
-            drawProtractor();
-        }
-
-        function drawProtractor() {
+<script>
+    function drawProtractor() {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = Math.min(canvas.width, canvas.height) / 2.5;
-            const startAngle = Math.PI / 2;
-            const endAngle = 3 * Math.PI / 2;
+            const radius = Math.min(canvas.width, canvas.height) / 3; // 调整量角器的大小
+            const startAngle = 3 * Math.PI / 2;
+            const endAngle = Math.PI / 2;
 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -64,47 +13,34 @@
             context.rotate(Math.PI);
             context.translate(-centerX, -centerY);
 
-            // Draw outer arc
+            // 绘制外圆弧
             context.strokeStyle = 'black';
             context.lineWidth = 2;
             context.beginPath();
             context.arc(centerX, centerY, radius, startAngle, endAngle, true);
             context.stroke();
 
-            context.restore();
-
-            context.save();
-            context.translate(centerX, centerY);
-            context.rotate(-Math.PI / 2);
-            context.translate(-centerX, -centerY);
-
-            // Draw baseline
+            // 绘制基准线
             context.beginPath();
-            context.moveTo(centerX - radius, centerY);
-            context.lineTo(centerX + radius, centerY);
+            context.moveTo(centerX, centerY - radius);
+            context.lineTo(centerX, centerY + radius);
             context.stroke();
 
-            context.restore();
-
-            context.save();
-            context.translate(centerX, centerY);
-            context.rotate(Math.PI);
-            context.translate(-centerX, -centerY);
-
-            // Draw tick marks and labels
+            // 绘制刻度线和标签
             for (let i = 0; i <= 180; i += 10) {
-                const angle = (i - 90) * (Math.PI / 180);
+                const angle = (i + 90) * (Math.PI / 180); // 旋转180度
                 const xOuter = centerX + Math.cos(angle) * radius;
                 const yOuter = centerY + Math.sin(angle) * radius;
-                const xInner = centerX + Math.cos(angle) * (radius - 20);
-                const yInner = centerY + Math.sin(angle) * (radius - 20);
+                const xInner = centerX + Math.cos(angle) * (radius - 20); // 调整刻度线长度
+                const yInner = centerY + Math.sin(angle) * (radius - 20); // 调整刻度线长度
 
+                context.strokeStyle = 'black';
                 context.beginPath();
                 context.moveTo(xInner, yInner);
                 context.lineTo(xOuter, yOuter);
                 context.stroke();
 
-                // Draw the 0-180 labels every 10 degrees
+                // 绘制0-180度标签，每10度一个标签
                 if (i % 10 === 0) {
                     context.fillStyle = 'black';
                     context.font = '14px Arial';
@@ -129,8 +65,8 @@
 
             context.restore();
 
-            // Draw the current angle line
-            const angleRadians = (currentAngle - 90) * (Math.PI / 180);
+            // 绘制当前角度线
+            const angleRadians = (-currentAngle + 90) * (Math.PI / 180); // 调整角度方向
             const xAngle = centerX + Math.cos(angleRadians) * radius;
             const yAngle = centerY + Math.sin(angleRadians) * radius;
 
@@ -141,22 +77,4 @@
             context.stroke();
         }
 
-        function updateAngle(event) {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const x = event.touches[0].clientX - centerX;
-            const y = event.touches[0].clientY - centerY;
-            const angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-            currentAngle = (angle < 0) ? angle + 360 : angle;
-            angleDisplay.textContent = `角度: ${Math.round(currentAngle)}°`;
-            drawProtractor();
-        }
-
-        canvas.addEventListener('touchmove', updateAngle);
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-    </script>
-</body>
-
-</html>
+</script>
